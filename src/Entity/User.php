@@ -33,10 +33,10 @@ class User
     #[ORM\Column]
     private ?bool $is_active = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\Column(type: "string", length: 20)]

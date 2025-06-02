@@ -1,0 +1,4 @@
+# .symfony.local.yaml
+php_version: 8.1  # ou votre version
+document_root: public/
+passthru: /index.php
