@@ -49,11 +49,6 @@ class WasteType
 
     public function setValue(string $value): self
     {
-        if (!in_array($value, self::ALLOWED_VALUES, true)) {
-            throw new \InvalidArgumentException(
-                "Invalid value: $value. Allowed values are: " . implode(', ', self::ALLOWED_VALUES)
-            );
-        }
         $this->value = $value;
         return $this;
     }
@@ -65,11 +60,7 @@ class WasteType
 
     public function setLabel(string $label): self
     {
-        if (!in_array($label, self::ALLOWED_LABELS, true)) {
-            throw new \InvalidArgumentException(
-                "Invalid label: $label. Allowed labels are: " . implode(', ', self::ALLOWED_LABELS)
-            );
-        }
+
         $this->label = $label;
         return $this;
     }

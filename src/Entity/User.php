@@ -154,7 +154,6 @@ class User
         return $this;
     }
 
-    // FIXED: Renamed methods to properly reflect Location relationship
     public function getLocation(): ?Location
     {
         return $this->location;
@@ -204,9 +203,7 @@ class User
         return trim($this->firstname . ' ' . $this->lastname);
     }
 
-    /**
-     * Lifecycle callback to update the updated_at timestamp
-     */
+
     #[ORM\PreUpdate]
     public function updateTimestamp(): void
     {

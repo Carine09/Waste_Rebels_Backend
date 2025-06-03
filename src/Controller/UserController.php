@@ -19,7 +19,7 @@ final class UserController extends AbstractController
     {
         $users = $repository->findAll();
         
-        // Format the response to include location data
+
         $userData = [];
         foreach ($users as $user) {
             $userData[] = [
@@ -60,7 +60,7 @@ final class UserController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        // Validate role
+  
         $role = $data['role'] ?? 'Volunteer';
         if (!in_array($role, User::getAllowedRoles())) {
             return $this->json([
@@ -78,7 +78,7 @@ final class UserController extends AbstractController
             $user->setPassword($data['password'] ?? '');
             $user->setIsActive($data['is_active'] ?? true);
 
-            // Handle location assignment
+           
             if (!empty($data['location_id'])) {
                 $locationRepository = $entityManager->getRepository(Location::class);
                 $location = $locationRepository->find($data['location_id']);

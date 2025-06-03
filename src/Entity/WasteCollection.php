@@ -14,71 +14,46 @@ class WasteCollection
     #[ORM\Column]
     private ?int $id = null;
 
-    // #[ORM\Column(type: Types::BIGINT)]
-    // private ?string $user_id = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'wasteCollections')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
-    // #[ORM\Column(type: Types::BIGINT)]
-    // private ?string $location_id = null;
-
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'waste_collections')]
-    private User $user_id;
-
-    #[ORM\ManyToOne(targetEntity: Location::class, inversedBy: 'waste_collections')]
-    private Location $location_id;
+    #[ORM\ManyToOne(targetEntity: Location::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Location $location = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
+
+    public function __construct()
+    {
+        $this->created_at = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    // public function getUserId(): ?string
-    // {
-    //     return $this->user_id;
-    // }
-
-    // public function setUserId(string $user_id): static
-    // {
-    //     $this->user_id = $user_id;
-
-    //     return $this;
-    // }
-
-    // public function getLocationId(): ?string
-    // {
-    //     return $this->location_id;
-    // }
-
-    // public function setLocationId(string $location_id): static
-    // {
-    //     $this->location_id = $location_id;
-
-    //     return $this;
-    // }
-
-    public function getUserId(): ?User
+    public function getUser(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUserId(?User $user_id): self
+    public function setUser(?User $user): self
     {
-        $this->user = $user_id;
-
+        $this->user = $user;
         return $this;
     }
 
-    public function getLocationId(): ?Location
+    public function getLocation(): ?Location
     {
-        return $this->location_id;
+        return $this->location;
     }
 
-    public function setLocationId(?Location $location_id): self
+    public function setLocation(?Location $location): self
     {
-        $this->location = $location_id;
-
+        $this->location = $location;
         return $this;
     }
 
@@ -90,7 +65,6 @@ class WasteCollection
     public function setCreatedAt(\DateTimeImmutable $created_at): static
     {
         $this->created_at = $created_at;
-
         return $this;
     }
 }

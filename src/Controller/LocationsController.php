@@ -18,7 +18,7 @@ final class LocationsController extends AbstractController
     {
         $locations = $repository->findAll();
         
-        // Format the response to include user count
+       
         $locationData = [];
         foreach ($locations as $location) {
             $locationData[] = [
@@ -85,7 +85,7 @@ final class LocationsController extends AbstractController
             ], Response::HTTP_NOT_FOUND);
         }
 
-        // Get users for this location
+       
         $users = [];
         foreach ($location->getUsers() as $user) {
             $users[] = [
@@ -120,7 +120,7 @@ final class LocationsController extends AbstractController
             ], Response::HTTP_NOT_FOUND);
         }
 
-        // Check if location has users - you might want to prevent deletion
+        
         if ($location->getUsers()->count() > 0) {
             return $this->json([
                 'success' => false,
