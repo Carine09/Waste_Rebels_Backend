@@ -6,13 +6,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class AdminController extends AbstractController
+final class WasteTypesController extends AbstractController
 {
-    #[Route('/admin', name: 'app_admin')]
+    #[Route('/waste/types', name: 'app_waste_types')]
     public function index(): Response
     {
-        return $this->render('admin/index.html.twig', [
-            'controller_name' => 'AdminController',
+        return $this->render('waste_types/index.html.twig', [
+            'controller_name' => 'WasteTypesController',
         ]);
     }
 }
