@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\WasteTypeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: WasteTypeRepository::class)]
 class WasteType
@@ -13,11 +15,11 @@ class WasteType
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 30)]
+    #[ORM\Column(type: "string", length: 30, nullable: false)]
     private string $value;
 
-    #[ORM\Column(type: "string", length: 30)]
-    private string $label;
+    #[ORM\OneToMany(targetEntity: WasteItem::class, mappedBy: 'wasteType')]
+    private Collection $wasteItems;
 
     private const ALLOWED_VALUES = [
         'cigarettes',
@@ -28,14 +30,10 @@ class WasteType
         'others',
     ];
 
-    private const ALLOWED_LABELS = [
-        'Cigarette butts',
-        'Plastic waste',
-        'Glass waste',
-        'Electronic waste',
-        'Metal waste',
-        'Others',
-    ];
+    public function __construct()
+    {
+        $this->wasteItems = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -49,19 +47,18 @@ class WasteType
 
     public function setValue(string $value): self
     {
+        if (!in_array($value, self::ALLOWED_VALUES)) {
+            throw new \InvalidArgumentException('Invalid value. Allowed values are: ' . implode(', ', self::ALLOWED_VALUES));
+        }
         $this->value = $value;
         return $this;
     }
 
-    public function getLabel(): string
+    /**
+     * @return Collection<int, WasteItem>
+     */
+    public function getWasteItems(): Collection
     {
-        return $this->label;
-    }
-
-    public function setLabel(string $label): self
-    {
-
-        $this->label = $label;
-        return $this;
+        return $this->wasteItems;
     }
 }

@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\WasteCollectionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection; 
 
 #[ORM\Entity(repositoryClass: WasteCollectionRepository::class)]
 class WasteCollection
@@ -22,12 +24,17 @@ class WasteCollection
     #[ORM\JoinColumn(nullable: false)]
     private ?Location $location = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+
+    #[ORM\OneToMany(targetEntity: WasteItem::class, mappedBy: 'wasteCollection', cascade: ['persist', 'remove'])]
+    private Collection $wasteItems;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
+    private \DateTimeImmutable $createdAt; 
 
     public function __construct()
     {
-        $this->created_at = new \DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable(); 
+        $this->wasteItems = new ArrayCollection(); 
     }
 
     public function getId(): ?int
@@ -40,7 +47,8 @@ class WasteCollection
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+
+    public function setUser(User $user): self
     {
         $this->user = $user;
         return $this;
@@ -51,20 +59,48 @@ class WasteCollection
         return $this->location;
     }
 
-    public function setLocation(?Location $location): self
+
+    public function setLocation(Location $location): self
     {
         $this->location = $location;
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable 
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, WasteItem> 
+     */
+    public function getWasteItems(): Collection
+    {
+        return $this->wasteItems;
+    }
+
+    public function addWasteItem(WasteItem $wasteItem): self
+    {
+        if (!$this->wasteItems->contains($wasteItem)) {
+            $this->wasteItems->add($wasteItem);
+            $wasteItem->setWasteCollection($this);
+        }
+        return $this;
+    }
+
+    public function removeWasteItem(WasteItem $wasteItem): self
+    {
+        if ($this->wasteItems->removeElement($wasteItem)) {
+            if ($wasteItem->getWasteCollection() === $this) {
+                $wasteItem->setWasteCollection(null);
+            }
+        }
         return $this;
     }
 }

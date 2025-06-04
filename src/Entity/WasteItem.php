@@ -14,45 +14,23 @@ class WasteItem
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::BIGINT)]
-    private ?string $waste_type_id = null;
+    #[ORM\ManyToOne(targetEntity: WasteCollection::class, inversedBy: 'wasteItems')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?WasteCollection $wasteCollection = null;
 
-    #[ORM\Column(type: Types::BIGINT)]
-    private ?string $waste_collection_id = null;
+    #[ORM\ManyToOne(targetEntity: WasteType::class, inversedBy: 'wasteItems')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?WasteType $wasteType = null;
 
-    #[ORM\Column]
-    private ?float $amount = null;
+    #[ORM\Column(type: Types::FLOAT, nullable: false)]
+    private float $amount;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getWasteTypeId(): ?string
-    {
-        return $this->waste_type_id;
-    }
-
-    public function setWasteTypeId(string $waste_type_id): static
-    {
-        $this->waste_type_id = $waste_type_id;
-
-        return $this;
-    }
-
-    public function getWasteCollectionId(): ?string
-    {
-        return $this->waste_collection_id;
-    }
-
-    public function setWasteCollectionId(string $waste_collection_id): static
-    {
-        $this->waste_collection_id = $waste_collection_id;
-
-        return $this;
-    }
-
-    public function getAmount(): ?float
+    public function getAmount(): float
     {
         return $this->amount;
     }
@@ -60,7 +38,28 @@ class WasteItem
     public function setAmount(float $amount): static
     {
         $this->amount = $amount;
+        return $this;
+    }
 
+    public function getWasteCollection(): ?WasteCollection
+    {
+        return $this->wasteCollection;
+    }
+
+    public function setWasteCollection(WasteCollection $wasteCollection): self
+    {
+        $this->wasteCollection = $wasteCollection;
+        return $this;
+    }
+
+    public function getWasteType(): ?WasteType
+    {
+        return $this->wasteType;
+    }
+
+    public function setWasteType(WasteType $wasteType): self
+    {
+        $this->wasteType = $wasteType;
         return $this;
     }
 }

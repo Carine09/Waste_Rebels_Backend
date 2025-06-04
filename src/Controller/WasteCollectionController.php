@@ -34,11 +34,15 @@ final class WasteCollectionController extends AbstractController
                     'id' => $collection->getLocation()->getId(),
                     'city' => $collection->getLocation()->getCity()
                 ],
-                'created_at' => $collection->getCreatedAt()?->format('Y-m-d H:i:s')
+                'created_at' => $collection->getCreatedAt()->format('Y-m-d H:i:s'), 
+                'waste_items_count' => $collection->getWasteItems()->count() 
             ];
         }
         
-        return $this->json($data);
+        return $this->json([
+            'success' => true,
+            'data' => $data
+        ]);
     }
 
     #[Route('/waste/collection', name: 'create_waste_collection', methods: ['POST'])]
@@ -52,7 +56,6 @@ final class WasteCollectionController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        
         if (empty($data['user_id']) || empty($data['location_id'])) {
             return $this->json([
                 'success' => false,
@@ -61,7 +64,6 @@ final class WasteCollectionController extends AbstractController
         }
 
         try {
-            
             $userRepository = $entityManager->getRepository(User::class);
             $user = $userRepository->find($data['user_id']);
             if (!$user) {
@@ -71,7 +73,7 @@ final class WasteCollectionController extends AbstractController
                 ], Response::HTTP_BAD_REQUEST);
             }
 
-       
+
             $locationRepository = $entityManager->getRepository(Location::class);
             $location = $locationRepository->find($data['location_id']);
             if (!$location) {
@@ -81,7 +83,6 @@ final class WasteCollectionController extends AbstractController
                 ], Response::HTTP_BAD_REQUEST);
             }
 
-            
             $wasteCollection = new WasteCollection();
             $wasteCollection->setUser($user);
             $wasteCollection->setLocation($location);
@@ -104,7 +105,7 @@ final class WasteCollectionController extends AbstractController
                         'id' => $wasteCollection->getLocation()->getId(),
                         'city' => $wasteCollection->getLocation()->getCity()
                     ],
-                    'created_at' => $wasteCollection->getCreatedAt()?->format('Y-m-d H:i:s')
+                    'created_at' => $wasteCollection->getCreatedAt()->format('Y-m-d H:i:s') 
                 ]
             ], Response::HTTP_CREATED);
 
@@ -127,6 +128,18 @@ final class WasteCollectionController extends AbstractController
             ], Response::HTTP_NOT_FOUND);
         }
 
+        $wasteItemsData = [];
+        foreach ($wasteCollection->getWasteItems() as $wasteItem) {
+            $wasteItemsData[] = [
+                'id' => $wasteItem->getId(),
+                'amount' => $wasteItem->getAmount(),
+                'waste_type' => [
+                    'id' => $wasteItem->getWasteType()->getId(),
+                    'value' => $wasteItem->getWasteType()->getValue()
+                ]
+            ];
+        }
+
         return $this->json([
             'success' => true,
             'data' => [
@@ -141,7 +154,8 @@ final class WasteCollectionController extends AbstractController
                     'id' => $wasteCollection->getLocation()->getId(),
                     'city' => $wasteCollection->getLocation()->getCity()
                 ],
-                'created_at' => $wasteCollection->getCreatedAt()?->format('Y-m-d H:i:s')
+                'created_at' => $wasteCollection->getCreatedAt()->format('Y-m-d H:i:s'),
+                'waste_items' => $wasteItemsData
             ]
         ]);
     }
