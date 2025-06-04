@@ -179,4 +179,19 @@ final class WasteCollectionController extends AbstractController
             'message' => 'Waste collection deleted successfully'
         ]);
     }
+
+    #[Route('/waste/collection', name: 'delete_all_collections', methods: ['DELETE'])]
+    public function deleteAllCollections(WasteCollectionRepository $repository, EntityManagerInterface $em): JsonResponse
+    {
+        $wasteCollections = $repository->findAll();
+        foreach ($wasteCollections as $collections) {
+            $em->remove($collections);
+        }
+        $em->flush();
+
+        return $this->json([
+            'success' => true,
+            'message' => 'All collections deleted successfully'
+        ]);
+    }
 }

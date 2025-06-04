@@ -14,6 +14,23 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class WasteTypesController extends AbstractController
 {
+    #[Route('/waste/type', name: 'show_all_waste_types', methods: ['GET'])]
+    public function showAllWasteTypes(WasteTypeRepository $repository): JsonResponse
+    {
+        $wasteTypes = $repository->findAll();
+        
+       
+        $wasteTypeData = [];
+        foreach ($wasteTypes as $types) {
+            $wasteTypeData[] = [
+                'id' => $types->getId(),
+                'value' => $types->getValue(),
+            ];
+        }
+        
+        return $this->json($wasteTypeData);
+    }
+
     #[Route('/waste/type', name: 'add_waste_type', methods: ['POST'])]
     public function addWasteType(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
