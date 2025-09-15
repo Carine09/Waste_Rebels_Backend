@@ -6,10 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -139,10 +141,14 @@ class User
         return $this;
     }
 
-    public function getRole(): string
-    {
-        return $this->role;
-    }
+    public function getRoles(): array
+{
+    return match ($this->role) {
+        'Admin' => ['ROLE_ADMIN'],
+        'Volunteer' => ['ROLE_VOLUNTEER'],
+        default => ['ROLE_USER'],
+    };
+}
 
     public function setRole(string $role): self
     {
@@ -208,5 +214,15 @@ class User
     public function updateTimestamp(): void
     {
         $this->updated_at = new \DateTimeImmutable();
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function eraseCredentials(): void
+    {
+        // Si tu stockes des données sensibles en clair (ex: plainPassword), nettoie-les ici
     }
 }
