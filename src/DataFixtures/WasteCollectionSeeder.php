@@ -9,70 +9,62 @@ use App\Entity\WasteType;
 use App\Entity\WasteItem;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface; 
 
-class WasteCollectionSeeder extends Fixture
+class WasteCollectionSeeder extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        // Catch volunteers
+        // Récupération des Volunteers
         $leonie = $manager->getRepository(User::class)->findOneBy(['email' => 'leoniemiege@gmail.com']);
         $carine = $manager->getRepository(User::class)->findOneBy(['email' => 'carine.randri@example.com']);
         $theo   = $manager->getRepository(User::class)->findOneBy(['email' => 'theo.paolo@example.com']);
 
         if (!$leonie || !$carine || !$theo) {
-            throw new \RuntimeException("Un ou plusieurs utilisateurs Volunteers n'ont pas été trouvés.");
+            throw new \RuntimeException("Un ou plusieurs Volunteers n'ont pas été trouvés. Lance UserSeeder d'abord.");
         }
 
-        // Catch Lyon and Marseille only (exist in the DB)
-        $lyon = $manager->getRepository(Location::class)->find(1);
-        $marseille = $manager->getRepository(Location::class)->find(2);
-        $paris = $manager->getRepository(Location::class)->find(3);
+        // Récupération des Locations (grâce à LocationSeeder)
+        $lyon      = $manager->getRepository(Location::class)->findOneBy(['city' => 'Lyon']);
+        $marseille = $manager->getRepository(Location::class)->findOneBy(['city' => 'Marseille']);
+        $paris     = $manager->getRepository(Location::class)->findOneBy(['city' => 'Paris']);
 
         if (!$lyon || !$marseille || !$paris) {
-            throw new \RuntimeException("Les villes Lyon, Marseille et Paris (id: 1, 2, 3) doivent exister en base de données.");
+            throw new \RuntimeException("Les villes Lyon, Marseille et Paris doivent exister (via LocationSeeder).");
         }
 
-        // Catch Waste Types
-        $wasteTypeValues = [
-            'cigarettes',
-            'plastic',
-            'glass',
-            'electronic_waste',
-            'metal_waste',
-            'others',
-        ];
-
-        $wasteTypes = [];
-        foreach ($wasteTypeValues as $value) {
-            $wasteType = $manager->getRepository(WasteType::class)->findOneBy(['value' => $value]);
-            if (!$wasteType) {
-                $wasteType = new WasteType();
-                $wasteType->setValue($value);
-                $manager->persist($wasteType);
-            }
-            $wasteTypes[] = $wasteType;
+        // Récupération des Waste Types déjà en base (via WasteTypeSeeder)
+        $wasteTypes = $manager->getRepository(WasteType::class)->findAll();
+        if (count($wasteTypes) < 6) {
+            throw new \RuntimeException("Tous les WasteTypes doivent être seedés avant (via WasteTypeSeeder).");
         }
 
-        // Match Volunteers and locations
+        // Associer Volunteers et Locations
         $userLocations = [
             [$leonie, $lyon],
             [$theo, $lyon],
             [$carine, $marseille],
         ];
-        // Create 3 WasteCollections per Volunteer with WasteItems
+
+        // Création de 3 WasteCollections par Volunteer
         foreach ($userLocations as [$user, $location]) {
             for ($i = 1; $i <= 3; $i++) {
                 $wasteCollection = new WasteCollection();
                 $wasteCollection->setUser($user);
                 $wasteCollection->setLocation($location);
 
-                // Add 2 to 4 random Waste Items 
+                // Ajouter 2 à 4 WasteItems aléatoires
                 $itemsCount = rand(2, 4);
                 for ($j = 0; $j < $itemsCount; $j++) {
                     $wasteItem = new WasteItem();
                     $wasteItem->setWasteCollection($wasteCollection);
-                    $wasteItem->setWasteType($wasteTypes[array_rand($wasteTypes)]);
-                    $wasteItem->setAmount(mt_rand(5, 100) / 10); // 0.5 à 10.0
+
+                    // Choisir un WasteType existant
+                    $wasteType = $wasteTypes[array_rand($wasteTypes)];
+                    $wasteItem->setWasteType($wasteType);
+
+                    // Quantité aléatoire entre 0.5 et 10.0 kg
+                    $wasteItem->setAmount(mt_rand(5, 100) / 10);
 
                     $manager->persist($wasteItem);
                 }
@@ -82,5 +74,14 @@ class WasteCollectionSeeder extends Fixture
         }
 
         $manager->flush();
+    }
+
+     public function getDependencies(): array
+    {
+        return [
+            LocationSeeder::class,
+            UserSeeder::class,
+            WasteTypeSeeder::class, 
+        ];
     }
 }
