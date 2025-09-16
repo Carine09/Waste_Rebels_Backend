@@ -40,4 +40,18 @@ class WasteCollectionRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findAllWithItems(): array
+    {
+    return $this->createQueryBuilder('wc')
+        ->select('DISTINCT wc, u, l, wi, wt')
+        ->leftJoin('wc.user', 'u')->addSelect('u')
+        ->leftJoin('wc.location', 'l')->addSelect('l')
+        ->leftJoin('wc.wasteItems', 'wi')->addSelect('wi')
+        ->leftJoin('wi.wasteType', 'wt')->addSelect('wt')
+        ->orderBy('wc.createdAt', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
+
 }

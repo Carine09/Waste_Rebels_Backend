@@ -8,6 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection; 
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['wasteCollection:read']]
+)]
+
 #[ORM\Entity(repositoryClass: WasteCollectionRepository::class)]
 class WasteCollection
 {
@@ -26,10 +30,12 @@ class WasteCollection
 
 
     #[ORM\OneToMany(targetEntity: WasteItem::class, mappedBy: 'wasteCollection', cascade: ['persist', 'remove'])]
+    #[Groups(['wasteCollection:read'])]
     private Collection $wasteItems;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
     private \DateTimeImmutable $createdAt; 
+
 
     public function __construct()
     {

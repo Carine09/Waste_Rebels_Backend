@@ -19,10 +19,12 @@ class WasteItem
     private ?WasteCollection $wasteCollection = null;
 
     #[ORM\ManyToOne(targetEntity: WasteType::class, inversedBy: 'wasteItems')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[JoinColumn(nullable: false)]
+    #[Groups(['wasteCollection:read'])]
     private ?WasteType $wasteType = null;
 
     #[ORM\Column(type: Types::FLOAT, nullable: false)]
+    #[Groups(['wasteCollection:read'])]
     private float $amount;
 
     public function getId(): ?int
