@@ -29,18 +29,41 @@ class UserSeeder extends Fixture
             $manager->persist($admin);
         }
 
-        // Vérifie si volunteer existe déjà
-        $existingVolunteer = $manager->getRepository(User::class)->findOneBy(['email' => 'volunteer@example.com']);
-        if (!$existingVolunteer) {
-            $volunteer = new User();
-            $volunteer->setFirstname('John')
-                ->setLastname('Doe')
-                ->setEmail('volunteer@example.com')
-                ->setRole('Volunteer')
-                ->setPassword($this->passwordHasher->hashPassword($volunteer, 'volunteer123'))
-                ->setIsActive(true);
+        // Liste des bénévoles à créer
+        $volunteers = [
+            [
+                'firstname' => 'Léonie',
+                'lastname'  => 'Miège',
+                'email'     => 'leoniemiege@gmail.com',
+                'password'  => 'leonie123',
+            ],
+            [
+                'firstname' => 'Carine',
+                'lastname'  => 'Randri',
+                'email'     => 'carine.randri@example.com',
+                'password'  => 'carine123',
+            ],
+            [
+                'firstname' => 'Theo',
+                'lastname'  => 'Paolo',
+                'email'     => 'theo.paolo@example.com',
+                'password'  => 'theo123',
+            ],
+        ];
 
-            $manager->persist($volunteer);
+        foreach ($volunteers as $data) {
+            $existingVolunteer = $manager->getRepository(User::class)->findOneBy(['email' => $data['email']]);
+            if (!$existingVolunteer) {
+                $volunteer = new User();
+                $volunteer->setFirstname($data['firstname'])
+                    ->setLastname($data['lastname'])
+                    ->setEmail($data['email'])
+                    ->setRole('Volunteer')
+                    ->setPassword($this->passwordHasher->hashPassword($volunteer, $data['password']))
+                    ->setIsActive(true);
+
+                $manager->persist($volunteer);
+            }
         }
 
         $manager->flush();

@@ -16,6 +16,7 @@ class WasteType
     private ?int $id = null;
 
     #[ORM\Column(type: "string", length: 30, nullable: false)]
+    #[Groups(['wasteCollection:read'])]
     private string $value;
 
     #[ORM\OneToMany(targetEntity: WasteItem::class, mappedBy: 'wasteType')]
