@@ -141,14 +141,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getRole(): string
+    {
+    return $this->role;
+    }
+
     public function getRoles(): array
-{
+    {
     return match ($this->role) {
         'Admin' => ['ROLE_ADMIN'],
         'Volunteer' => ['ROLE_VOLUNTEER'],
         default => ['ROLE_USER'],
     };
-}
+    }
 
     public function setRole(string $role): self
     {
